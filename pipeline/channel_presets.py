@@ -172,23 +172,41 @@ PRESETS: dict[str, ChannelPreset] = {
     },
     "hindi_myth": {
         "id": "hindi_myth",
-        "label": "Hindi Devotional Speed & Chariot Legends",
+        "label": "Bilingual Devotional Speed & Chariot Legends (Hindi + English)",
         "topic_rotation": "myth",
-        "language": "hi",
-        "min_words": 100,
-        "tts_voice": "hi-IN-SwaraNeural",
-        "caption_font": "NotoSansDevanagari-Bold.ttf",
-        "caption_font_name": "Noto Sans Devanagari",
-        "yt_token_env": "YT_REFRESH_TOKEN_MYTH",
-        "extra_yt_token_envs": ["YT_REFRESH_TOKEN_MYTH_2"],
+        "variants": [
+            {
+                "lang": "hi",
+                "label": "Hindi",
+                "tts_voice": "hi-IN-SwaraNeural",
+                "caption_font": "NotoSansDevanagari-Bold.ttf",
+                "caption_font_name": "Noto Sans Devanagari",
+                "yt_token_env": "YT_REFRESH_TOKEN_MYTH",
+                "min_words": 100,
+            },
+            {
+                "lang": "en",
+                "label": "English",
+                "tts_voice": "en-US-GuyNeural",
+                "caption_font": "BebasNeue-Regular.ttf",
+                "caption_font_name": "Bebas Neue",
+                "yt_token_env": "YT_REFRESH_TOKEN_EN",
+                "min_words": 80,
+            },
+        ],
         "groq_system_hint": (
-            "You write respectful Hindi Shorts linking ancient Indian scriptures, epics, and divine vehicles (Vahanas/Chariots) "
-            "to modern concepts of speed, engineering, and horsepower. "
-            "LANGUAGE: full_narration, youtube_title, youtube_description entirely in Devanagari Hindi. "
-            "IMAGE PROMPTS: English only — epic cinematic descriptions of ancient divine vehicles or royal chariots with celestial energy (no text in image). "
-            "CRITICAL LENGTH: full_narration 105-135 Devanagari words (~40-50 sec spoken). "
-            "Tone: Warm, storytelling, reverent. Focus on the legendary power, mechanics, and jaw-dropping speed of mythological transportation. "
-            "No hashtags in narration. The creator gives a specific story angle in the user message — stay on that topic."
+            "You write respectful YouTube Shorts linking ancient Indian scriptures, epics, and divine vehicles (Vahanas/Chariots) "
+            "to concepts of speed, divine horsepower, and cosmic engineering — in MULTIPLE languages. "
+            "The same myth fact will be published as separate videos on different language channels. "
+            "STRUCTURE: Intense opening hook about an ancient weapon, speed metric, or chariot feat, detailed storytelling in the middle, and a powerful takeaway or cosmic realization at the end. "
+            "TONE: Warm, storytelling, reverent, yet highly energetic. Focus on the legendary power, mechanics, and jaw-dropping scale of mythological transportation. "
+            "No hashtags inside narration. Original phrasing only. "
+            "IMAGE PROMPT RULE: Write image prompts in ENGLISH only. Describe epic cinematic scenes of ancient divine vehicles or royal chariots radiating celestial energy. "
+            "NEVER write 'cartoon' or 'photorealistic face'. Examples: 'epic digital painting of a majestic ancient gold chariot flying through dark cosmic nebula trails, glowing energy wheel tracks', "
+            "'wide cinematic shot of a warrior standing on a grand iron chariot overlooking an epic ancient battlefield at sunset'. "
+            "BILINGUAL RULE: The SAME story must be expressed naturally in each language — do not translate word-for-word. "
+            "HINDI LENGTH: variants.hi.full_narration must be entirely in Devanagari Hindi, aiming for 105-135 words (~40-50 seconds). "
+            "ENGLISH LENGTH: variants.en.full_narration must be in English, aiming for 100-125 words (~35-45 seconds)."
         ),
         "segment_count": 6,
         "image_style_suffix": (
