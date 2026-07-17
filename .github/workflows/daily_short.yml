@@ -4,8 +4,7 @@ on:
   schedule:
   #IST - 3:30 AM
   #IST - 5:30 AM
-    - cron: "0 10 * * *"
-    - cron: "30 23 * * *" 
+    - cron: "0 10 * * 0"
   workflow_dispatch:
     inputs:
       channel:
