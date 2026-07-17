@@ -88,7 +88,7 @@ PRESETS: dict[str, ChannelPreset] = {
             "ENGLISH LENGTH: variants.en.full_narration must be long-form too — "
             "aim 120-155 English words; include hook, 3-4 developed beats with technical racing stats, and a strong closing line so the English voiceover is ~40-50 seconds."
         ),
-        "segment_count": 5,
+        "segment_count": 10,
         "image_style_suffix": (
             ", photorealistic motorsport photography, cinematic dramatic lighting, high speed motion blur, ultra detailed, "
             "8k, sharp focus, professional trackside camera, realistic carbon fiber textures, "
