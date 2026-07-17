@@ -2,7 +2,7 @@ name: Daily Hindi Myth Short
 
 on:
   schedule:
-    - cron: "0 10 * * 2,4,6"
+    - cron: "0 17 * * 2,4,6"
   workflow_dispatch:
     inputs:
       topic:
