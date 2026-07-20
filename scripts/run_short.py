@@ -200,25 +200,27 @@ def main() -> None:
             time.sleep(cooldown)
 
     # ── 4-6. Render (per variant) ────────────────────────────────────
+    # ── 4-6. Render (per variant) ────────────────────────────────────
     if variants:
         for v in variants:
             node = pack["variants"][v["lang"]]
-            _render_and_upload(
-                variant_label=v["label"],
-                narration=node["full_narration"],
-                title=node["youtube_title"],
-                description=node.get("youtube_description", ""),
-                tags=node.get("youtube_tags"),
-                voice=v.get("tts_voice"),
-                font_file=v.get("caption_font", "CreepsterCaps.ttf"),
-                font_name=v.get("caption_font_name", "Creepster"),
-                image_paths=image_paths,
-                run_dir=run_dir,
-                suffix=f"_{v['lang']}",
-                upload=args.upload,
-                privacy=args.privacy,
-                yt_token_env=v.get("yt_token_env", "YT_REFRESH_TOKEN"),
-            )
+            v_args = {
+                "variant_label": v["label"],
+                "narration": node["full_narration"],
+                "title": node["youtube_title"],
+                "description": node.get("youtube_description", ""),
+                "tags": node.get("youtube_tags"),
+                "voice": v.get("tts_voice"),
+                "font_file": v.get("caption_font", "CreepsterCaps.ttf"),
+                "font_name": v.get("caption_font_name", "Creepster"),
+                "image_paths": image_paths,
+                "run_dir": run_dir,
+                "suffix": f"_{v['lang']}",
+                "upload": args.upload,
+                "privacy": args.privacy,
+                "yt_token_env": v.get("yt_token_env", "YT_REFRESH_TOKEN"),
+            }
+            _render_and_upload(**v_args)
     else:
         primary_video_path = _render_and_upload(
             variant_label=preset.get("language", "en"),
