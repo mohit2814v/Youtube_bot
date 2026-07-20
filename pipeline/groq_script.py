@@ -157,7 +157,6 @@ STRICT RULES:
             if attempt == max_attempts - 1:
                 raise
 
-    # Fallback (should be unreachable due to raise above)
     return data
 
 
@@ -167,15 +166,17 @@ STRICT RULES:
 def _generate_multivariant(
     preset: ChannelPreset, user: str, n: int, variants: list,
 ) -> dict[str, Any]:
-    # Build the per-language requirement lines
-    # Look for where the variant dictionary schema string is appended:
+    # Build the per-language requirement lines cleanly
+    lang_lines = []
+    for v in variants:
+        lang = v["lang"]
+        _, _, blurb = LANG_WORD_TARGETS.get(lang, LANG_WORD_TARGETS["en"])
         lang_lines.append(
             f'    "{lang}": {{\n'
             f'      "youtube_title": "catchy title in {_lang_label(lang)} (<90 chars, no hashtags)",\n'
             f'      "youtube_description": "Detailed 4-5 sentence SEO summary in {_lang_label(lang)} with natural keywords + 5-8 viral hashtags including #Shorts",\n'
             f'      "youtube_tags": ["tag1", "tag2", "15-20 specific search keywords and tags in {_lang_label(lang)}"],\n'
-            f'      "full_narration": "ONE continuous paragraph in {_lang_label(lang)}. '
-            f'{blurb}. Natural spoken narration, no segment markers."\n'
+            f'      "full_narration": "ONE continuous paragraph in {_lang_label(lang)}. {blurb}. Natural spoken narration, no segment markers."\n'
             f'    }}'
         )
     variants_block = ",\n".join(lang_lines)
@@ -203,7 +204,6 @@ STRICT RULES:
 - "image_prompts" array MUST have exactly {n} entries, ALL in English.
 - "variants" object MUST contain keys: {lang_keys}.
 - Each variant tells the SAME facts/story but written natively in that language (not literal translation).
-# Look for the formatting rules paragraph near the bottom of the prompt:
 - Word-count targets per language:
 {word_targets}
 - Narrations are continuous spoken paragraphs — no segment numbers, no headings.
@@ -223,7 +223,6 @@ STRICT RULES:
                 "Keep the same facts/story and the same image_prompts beats; "
                 "expand ONLY the narration(s) that were too short — add 3-5 full sentences each.\n"
             )
-        # Later attempts: lower temperature so the model obeys length constraints more reliably.
         temp = 0.85 if attempt < 2 else 0.45
         data = _call_groq(preset, user + extra, temperature=temp)
         try:
