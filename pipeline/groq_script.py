@@ -98,7 +98,11 @@ def _generate_single(preset: ChannelPreset, user: str, n: int) -> dict[str, Any]
 Return ONLY valid JSON with this shape:
 {{
   "youtube_title": "short catchy title, under 90 chars, no hashtags",
-  "youtube_description": "2-3 sentences plus optional #Shorts at end",
+  "youtube_description": "Detailed 4-5 sentence SEO-optimized summary naturally incorporating high-search-volume keywords and key takeaways, followed by 5-8 viral hashtags at the end including #Shorts",
+  "youtube_tags": [
+    "keyword 1", "keyword 2", "keyword 3",
+    "15 to 20 specific high-ranking search keywords/tags related to this topic"
+  ],
   {narration_rule},
   "image_prompts": [
     "visual description for image 1: setting, subject, action. No style words. No text in image.",
