@@ -168,14 +168,12 @@ def _generate_multivariant(
     preset: ChannelPreset, user: str, n: int, variants: list,
 ) -> dict[str, Any]:
     # Build the per-language requirement lines
-    lang_lines = []
-    for v in variants:
-        lang = v["lang"]
-        lo, hi, blurb = LANG_WORD_TARGETS.get(lang, LANG_WORD_TARGETS["en"])
+    # Look for where the variant dictionary schema string is appended:
         lang_lines.append(
             f'    "{lang}": {{\n'
             f'      "youtube_title": "catchy title in {_lang_label(lang)} (<90 chars, no hashtags)",\n'
-            f'      "youtube_description": "2-3 sentences in {_lang_label(lang)} + optional #Shorts",\n'
+            f'      "youtube_description": "Detailed 4-5 sentence SEO summary in {_lang_label(lang)} with natural keywords + 5-8 viral hashtags including #Shorts",\n'
+            f'      "youtube_tags": ["tag1", "tag2", "15-20 specific search keywords and tags in {_lang_label(lang)}"],\n'
             f'      "full_narration": "ONE continuous paragraph in {_lang_label(lang)}. '
             f'{blurb}. Natural spoken narration, no segment markers."\n'
             f'    }}'
