@@ -203,10 +203,11 @@ STRICT RULES:
 - "image_prompts" array MUST have exactly {n} entries, ALL in English.
 - "variants" object MUST contain keys: {lang_keys}.
 - Each variant tells the SAME facts/story but written natively in that language (not literal translation).
+# Look for the formatting rules paragraph near the bottom of the prompt:
 - Word-count targets per language:
 {word_targets}
 - Narrations are continuous spoken paragraphs — no segment numbers, no headings.
-- Titles/descriptions: each in its own language.
+- Titles/descriptions/tags: each in its own language. Ensure youtube_tags has 15-20 relevant search tags per language.
 - BEFORE you output JSON: mentally count words in each full_narration. If English is under 115 words OR Hindi under 100 words, REWRITE that paragraph longer (same facts) until counts are met.
 """
 
