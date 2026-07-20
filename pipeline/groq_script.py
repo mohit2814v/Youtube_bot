@@ -14,6 +14,7 @@ from groq import Groq
 
 from pipeline.channel_presets import ChannelPreset
 from pipeline.story_history import history_prompt_block
+from pipeline.youtube_upload import normalize_description, normalize_tags
 
 GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
 
@@ -100,8 +101,8 @@ Return ONLY valid JSON with this shape:
   "youtube_title": "short catchy title, under 90 chars, no hashtags",
   "youtube_description": "Detailed 4-5 sentence SEO-optimized summary naturally incorporating high-search-volume keywords and key takeaways, followed by 5-8 viral hashtags at the end including #Shorts",
   "youtube_tags": [
-    "keyword 1", "keyword 2", "keyword 3",
-    "15 to 20 specific high-ranking search keywords/tags related to this topic"
+    "keyword1", "keyword2", "keyword3",
+    "15 to 20 specific high-ranking search keywords/tags related to this topic (output real tags only, no instruction text)"
   ],
   {narration_rule},
   "image_prompts": [
@@ -151,6 +152,15 @@ STRICT RULES:
                     f"Narration too short ({word_count} words, expected ≥ {min_words} for {language})"
                 )
 
+            if not (data.get("youtube_title") or "").strip():
+                raise ValueError("Missing youtube_title")
+            if not (data.get("youtube_description") or "").strip():
+                raise ValueError("Missing youtube_description")
+            if not data.get("youtube_tags") or not isinstance(data.get("youtube_tags"), (list, str)):
+                raise ValueError("Missing or invalid youtube_tags")
+
+            data["youtube_description"] = normalize_description(data.get("youtube_description"))
+            data["youtube_tags"] = normalize_tags(data.get("youtube_tags"))
             return data
         except ValueError as e:
             last_err = str(e)
@@ -175,7 +185,7 @@ def _generate_multivariant(
             f'    "{lang}": {{\n'
             f'      "youtube_title": "catchy title in {_lang_label(lang)} (<90 chars, no hashtags)",\n'
             f'      "youtube_description": "Detailed 4-5 sentence SEO summary in {_lang_label(lang)} with natural keywords + 5-8 viral hashtags including #Shorts",\n'
-            f'      "youtube_tags": ["tag1", "tag2", "15-20 specific search keywords and tags in {_lang_label(lang)}"],\n'
+            f'      "youtube_tags": ["tag1", "tag2", "15-20 specific search keywords and tags in {_lang_label(lang)} (real tags only, no instruction text)"],\n'
             f'      "full_narration": "ONE continuous paragraph in {_lang_label(lang)}. {blurb}. Natural spoken narration, no segment markers."\n'
             f'    }}'
         )
@@ -267,6 +277,13 @@ def _assert_multivariant_valid(data: dict[str, Any], variants: list, n: int) -> 
 
         if not (node.get("youtube_title") or "").strip():
             raise ValueError(f"variants['{lang}'].youtube_title empty")
+        if not (node.get("youtube_description") or "").strip():
+            raise ValueError(f"variants['{lang}'].youtube_description empty")
+        if not node.get("youtube_tags") or not isinstance(node.get("youtube_tags"), (list, str)):
+            raise ValueError(f"variants['{lang}'].youtube_tags missing or invalid")
+
+        node["youtube_description"] = normalize_description(node.get("youtube_description"))
+        node["youtube_tags"] = normalize_tags(node.get("youtube_tags"))
 
 
 def _call_groq(
