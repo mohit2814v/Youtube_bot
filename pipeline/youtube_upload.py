@@ -94,6 +94,7 @@ def upload_short(
     title: str,
     description: str,
     *,
+    tags: list[str] | None = None,
     privacy_status: str = "private",
     category_id: str = "24",
     refresh_token_env: str = "YT_REFRESH_TOKEN",
@@ -105,16 +106,15 @@ def upload_short(
     """
     creds = _get_creds(refresh_token_env)
     youtube = build("youtube", "v3", credentials=creds)
-
     body = {
         "snippet": {
             "title": title[:100],
             "description": description[:5000],
             "categoryId": category_id,
+            "tags": (tags or [])[:30],
         },
         "status": {
             "privacyStatus": privacy_status,
-            "selfDeclaredMadeForKids": False,
         },
     }
     media = MediaFileUpload(str(video_path), chunksize=-1, resumable=True, mimetype="video/mp4")
