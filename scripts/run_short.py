@@ -98,6 +98,7 @@ def _render_and_upload(
         print(f"⑥ YouTube: uploading ({yt_token_env})…")
         vid = upload_short(
             video_path, title, description,
+            tags=tags,
             privacy_status=privacy,
             refresh_token_env=yt_token_env,
         )
@@ -201,12 +202,13 @@ def main() -> None:
     # ── 4-6. Render (per variant) ────────────────────────────────────
     if variants:
         for v in variants:
-            node = pack["variants"][v["lang"]]
+           node = pack["variants"][v["lang"]]
             _render_and_upload(
                 variant_label=v["label"],
                 narration=node["full_narration"],
                 title=node["youtube_title"],
                 description=node.get("youtube_description", ""),
+                tags=node.get("youtube_tags"),
                 voice=v.get("tts_voice"),
                 font_file=v.get("caption_font", "CreepsterCaps.ttf"),
                 font_name=v.get("caption_font_name", "Creepster"),
@@ -223,7 +225,9 @@ def main() -> None:
             narration=narration,
             title=title,
             description=pack.get("youtube_description", ""),
+            tags=pack.get("youtube_tags"),
             voice=preset.get("tts_voice") or os.environ.get("EDGE_TTS_VOICE"),
+            # ... keeping rest of arguments intact ...
             font_file=preset.get("caption_font", "CreepsterCaps.ttf"),
             font_name=preset.get("caption_font_name", "Creepster"),
             image_paths=image_paths,
@@ -255,6 +259,7 @@ def main() -> None:
                 primary_video_path,
                 history_title,
                 pack.get("youtube_description", ""),
+                tags=pack.get("youtube_tags"),
                 privacy_status=args.privacy,
                 refresh_token_env=env_name,
             )
