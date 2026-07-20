@@ -220,7 +220,9 @@ def main() -> None:
                 "privacy": args.privacy,
                 "yt_token_env": v.get("yt_token_env", "YT_REFRESH_TOKEN"),
             }
-            _render_and_upload(**v_args)
+            rendered = _render_and_upload(**v_args)
+            if not primary_video_path:
+                primary_video_path = rendered
     else:
         primary_video_path = _render_and_upload(
             variant_label=preset.get("language", "en"),
@@ -254,13 +256,20 @@ def main() -> None:
     if args.upload and primary_video_path and extra_envs:
         from pipeline.youtube_upload import upload_short
 
+        if variants:
+            desc_extra = pack["variants"][variants[0]["lang"]].get("youtube_description", "")
+            tags_extra = pack["variants"][variants[0]["lang"]].get("youtube_tags")
+        else:
+            desc_extra = pack.get("youtube_description", "")
+            tags_extra = pack.get("youtube_tags")
+
         for env_name in extra_envs:
             print(f"⑦ Extra YouTube upload ({env_name})…")
             vid_extra = upload_short(
                 primary_video_path,
                 history_title,
-                pack.get("youtube_description", ""),
-                tags=pack.get("youtube_tags"),
+                desc_extra,
+                tags=tags_extra,
                 privacy_status=args.privacy,
                 refresh_token_env=env_name,
             )
