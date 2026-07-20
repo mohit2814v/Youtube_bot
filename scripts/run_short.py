@@ -58,6 +58,7 @@ def _render_and_upload(
     narration: str,
     title: str,
     description: str,
+    tags: list[str] | None = None,
     voice: str | None,
     font_file: str,
     font_name: str,
