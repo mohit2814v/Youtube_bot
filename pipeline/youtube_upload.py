@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+from typing import Any
 
 from google.auth.exceptions import RefreshError
 from google.auth.transport.requests import Request
@@ -89,12 +90,64 @@ def _get_creds(refresh_token_env: str = "YT_REFRESH_TOKEN") -> Credentials:
     return _creds_from_files(client_secret, token)
 
 
+def normalize_tags(tags: Any) -> list[str]:
+    """Normalize and sanitize tags for YouTube API v3 (max 30 tags, max 100 chars each, max 450 total chars)."""
+    if not tags:
+        return []
+    if isinstance(tags, str):
+        s = tags.strip()
+        if s.startswith("[") and s.endswith("]"):
+            try:
+                parsed = json.loads(s)
+                if isinstance(parsed, list):
+                    tags = parsed
+            except Exception:
+                pass
+        if isinstance(tags, str):
+            tags = [t.strip() for t in tags.replace("\n", ",").split(",") if t.strip()]
+    elif not isinstance(tags, (list, tuple)):
+        return []
+
+    cleaned: list[str] = []
+    seen: set[str] = set()
+    total_len = 0
+    for t in tags:
+        if not isinstance(t, str):
+            t = str(t)
+        t = t.strip()
+        if t.startswith("#"):
+            t = t[1:].strip()
+        t = "".join(c for c in t if c not in '<>"').strip()
+        if not t:
+            continue
+        if len(t) > 100:
+            t = t[:100].strip()
+        t_lower = t.lower()
+        if t_lower in seen:
+            continue
+        if total_len + len(t) + 2 > 450 or len(cleaned) >= 30:
+            break
+        cleaned.append(t)
+        seen.add(t_lower)
+        total_len += len(t) + 2
+    return cleaned
+
+
+def normalize_description(description: Any) -> str:
+    """Normalize and truncate description to within YouTube API limit (max 5000 chars)."""
+    if not description:
+        return ""
+    if not isinstance(description, str):
+        description = str(description)
+    return description.strip()[:5000]
+
+
 def upload_short(
     video_path: Path,
     title: str,
     description: str,
     *,
-    tags: list[str] | None = None,
+    tags: list[str] | str | None = None,
     privacy_status: str = "private",
     category_id: str = "24",
     refresh_token_env: str = "YT_REFRESH_TOKEN",
@@ -106,12 +159,14 @@ def upload_short(
     """
     creds = _get_creds(refresh_token_env)
     youtube = build("youtube", "v3", credentials=creds)
+    norm_desc = normalize_description(description)
+    norm_tags = normalize_tags(tags)
     body = {
         "snippet": {
             "title": title[:100],
-            "description": description[:5000],
+            "description": norm_desc,
             "categoryId": category_id,
-            "tags": (tags or [])[:30],
+            "tags": norm_tags,
         },
         "status": {
             "privacyStatus": privacy_status,
