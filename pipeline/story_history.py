@@ -61,7 +61,7 @@ def history_prompt_block(channel: str) -> str:
 
     listing = "\n".join(lines)
     return (
-        "\n\nIMPORTANT — Do NOT repeat or closely resemble any of these past stories. "
-        "Pick a COMPLETELY different plot, setting, characters, and theme:\n"
+        "\n\nCRITICAL ANTI-REPEAT RULE — You must NEVER repeat, re-angle, or cover the same topic, statistic, historical event, or story idea as any of these previous videos:\n"
         f"{listing}\n"
+        "If the topic idea provided is already covered or too similar to any item above, or if no topic idea is given, you MUST invent a completely FRESH, UNIQUE topic/statistic/event from your domain that has never been covered above.\n"
     )

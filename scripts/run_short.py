@@ -121,15 +121,39 @@ def main() -> None:
     img_dir = run_dir / "images"
     img_dir.mkdir(parents=True, exist_ok=True)
 
-    # Pick a topic: CLI --topic wins; else random from topic_pool.
+    # Pick a topic: CLI --topic wins; else pick an unused topic from topic_pool.
     topic_hint = args.topic.strip() or None
     if not topic_hint:
         pool = preset.get("topic_pool") or []
         if pool:
-            topic_hint = random.choice(pool)
-            print(f"🎲 Random topic from pool: {topic_hint!r}")
+            from pipeline.story_history import load_history
 
-    variants = preset.get("variants") or []
+            past_entries = load_history(args.channel)
+            past_texts = [
+                f"{item.get('title', '')} {item.get('summary', '')}".lower()
+                for item in past_entries
+            ]
+
+            unused = []
+            for candidate in pool:
+                words = [w.lower() for w in candidate.split() if len(w) > 3]
+                already_covered = False
+                for past in past_texts:
+                    # Check if candidate or multiple key words are in past video title/summary
+                    matches = sum(1 for w in words if w in past)
+                    if matches >= 3 or (len(words) <= 3 and matches >= 2) or candidate.lower() in past:
+                        already_covered = True
+                        break
+                if not already_covered:
+                    unused.append(candidate)
+
+            if unused:
+                topic_hint = random.choice(unused)
+                print(f"🎲 Fresh topic selected from pool ({len(unused)} remaining unused): {topic_hint!r}")
+            else:
+                topic_hint = None
+                print("🎲 All pool topics have been covered; letting AI generate a completely fresh topic not in history.")
+
     primary_video_path: Path | None = None
 
     # ── 1. Script via Groq ───────────────────────────────────────────

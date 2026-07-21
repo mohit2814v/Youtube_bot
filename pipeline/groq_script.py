@@ -147,21 +147,6 @@ STRICT RULES:
     return data
 
 
-# ─────────────────────────────────────────────────────────────────────────
-# Multi-variant path (one Groq call returns every language's narration)
-
-
-        if not (node.get("youtube_title") or "").strip():
-            raise ValueError(f"variants['{lang}'].youtube_title empty")
-        if not (node.get("youtube_description") or "").strip():
-            raise ValueError(f"variants['{lang}'].youtube_description empty")
-        if not node.get("youtube_tags") or not isinstance(node.get("youtube_tags"), (list, str)):
-            raise ValueError(f"variants['{lang}'].youtube_tags missing or invalid")
-
-        node["youtube_description"] = normalize_description(node.get("youtube_description"))
-        node["youtube_tags"] = normalize_tags(node.get("youtube_tags"))
-
-
 def _call_groq(
     preset: ChannelPreset,
     user: str,
