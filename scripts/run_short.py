@@ -141,26 +141,13 @@ def main() -> None:
 
     image_prompts = pack["image_prompts"]
 
-    if variants:
-        # Bilingual mode: each lang gets its own audio/SRT/video
-        first_v = variants[0]
-        first_node = pack["variants"][first_v["lang"]]
-        print(f"   Title ({first_v['label']}): {first_node['youtube_title']}")
-        for v in variants:
-            node = pack["variants"][v["lang"]]
-            wc = len(node["full_narration"].split())
-            print(f"   {v['label']}: {wc} words")
-        print(f"   {len(image_prompts)} image prompts (shared)")
-        history_title = first_node["youtube_title"]
-        history_narration = first_node["full_narration"]
-    else:
-        title = pack["youtube_title"]
-        narration = pack["full_narration"]
-        word_count = len(narration.split())
-        print(f"   Title: {title}")
-        print(f"   Narration: {word_count} words, {len(image_prompts)} image prompts")
-        history_title = title
-        history_narration = narration
+    title = pack["youtube_title"]
+    narration = pack["full_narration"]
+    word_count = len(narration.split())
+    print(f"   Title: {title}")
+    print(f"   Narration: {word_count} words, {len(image_prompts)} image prompts")
+    history_title = title
+    history_narration = narration
 
     # ── 2. Images via DeAPI (generated ONCE, shared by all variants) ──
     w = int(os.environ.get("DEAPI_IMAGE_WIDTH", "768"))
@@ -186,47 +173,23 @@ def main() -> None:
         if i < len(image_prompts) - 1:
             time.sleep(cooldown)
 
-    # ── 4-6. Render (per variant) ────────────────────────────────────
-    # ── 4-6. Render (per variant) ────────────────────────────────────
-    if variants:
-        for v in variants:
-            node = pack["variants"][v["lang"]]
-            v_args = {
-                "variant_label": v["label"],
-                "narration": node["full_narration"],
-                "title": node["youtube_title"],
-                "description": node.get("youtube_description", ""),
-                "tags": node.get("youtube_tags"),
-                "voice": v.get("tts_voice"),
-                "font_file": v.get("caption_font", "CreepsterCaps.ttf"),
-                "font_name": v.get("caption_font_name", "Creepster"),
-                "image_paths": image_paths,
-                "run_dir": run_dir,
-                "suffix": f"_{v['lang']}",
-                "upload": args.upload,
-                "privacy": args.privacy,
-                "yt_token_env": v.get("yt_token_env", "YT_REFRESH_TOKEN"),
-            }
-            rendered = _render_and_upload(**v_args)
-            if not primary_video_path:
-                primary_video_path = rendered
-    else:
-        primary_video_path = _render_and_upload(
-            variant_label=preset.get("language", "en"),
-            narration=narration,
-            title=title,
-            description=pack.get("youtube_description", ""),
-            tags=pack.get("youtube_tags"),
-            voice=preset.get("tts_voice") or os.environ.get("EDGE_TTS_VOICE"),
-            font_file=preset.get("caption_font", "CreepsterCaps.ttf"),
-            font_name=preset.get("caption_font_name", "Creepster"),
-            image_paths=image_paths,
-            run_dir=run_dir,
-            suffix="",
-            upload=args.upload,
-            privacy=args.privacy,
-            yt_token_env=preset.get("yt_token_env") or "YT_REFRESH_TOKEN",
-        )
+    # ── 4-6. Render and Upload ───────────────────────────────────────
+    primary_video_path = _render_and_upload(
+        variant_label=preset.get("language", "en"),
+        narration=narration,
+        title=title,
+        description=pack.get("youtube_description", ""),
+        tags=pack.get("youtube_tags"),
+        voice=preset.get("tts_voice") or os.environ.get("EDGE_TTS_VOICE"),
+        font_file=preset.get("caption_font", "CreepsterCaps.ttf"),
+        font_name=preset.get("caption_font_name", "Creepster"),
+        image_paths=image_paths,
+        run_dir=run_dir,
+        suffix="",
+        upload=args.upload,
+        privacy=args.privacy,
+        yt_token_env=preset.get("yt_token_env") or "YT_REFRESH_TOKEN",
+    )
 
     # ── 7. History ───────────────────────────────────────────────────
     summary = " ".join(history_narration.split()[:25]) + "…"
@@ -239,12 +202,8 @@ def main() -> None:
     if args.upload and primary_video_path and extra_envs:
         from pipeline.youtube_upload import upload_short
 
-        if variants:
-            desc_extra = pack["variants"][variants[0]["lang"]].get("youtube_description", "")
-            tags_extra = pack["variants"][variants[0]["lang"]].get("youtube_tags")
-        else:
-            desc_extra = pack.get("youtube_description", "")
-            tags_extra = pack.get("youtube_tags")
+        desc_extra = pack.get("youtube_description", "")
+        tags_extra = pack.get("youtube_tags")
 
         for env_name in extra_envs:
             print(f"⑦ Extra YouTube upload ({env_name})…")
