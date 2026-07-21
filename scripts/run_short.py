@@ -20,10 +20,8 @@ Bilingual flow (preset has `variants`):
     YouTube upload (optional, per-channel token)
 
 Usage:
-  .venv/bin/python scripts/run_short.py --channel ghost_stories
+  .venv/bin/python scripts/run_short.py --channel school_story
   .venv/bin/python scripts/run_short.py --channel facts --upload --privacy public
-  .venv/bin/python scripts/run_short.py --channel hindi_myth
-  # hindi_myth: topic = IST day theme (Ganesha→Shiva→…) + random unused line; --topic overrides
 """
 from __future__ import annotations
 
@@ -123,24 +121,13 @@ def main() -> None:
     img_dir = run_dir / "images"
     img_dir.mkdir(parents=True, exist_ok=True)
 
-    # Myth rotation: IST calendar picks theme (Ganesha → Shiva → …); random unused topic in that theme.
-    myth_theme_for_commit: str | None = None
-    myth_topic_for_commit: str | None = None
-
-    # Pick a topic: CLI --topic wins; else myth rotation; else random from topic_pool.
+    # Pick a topic: CLI --topic wins; else random from topic_pool.
     topic_hint = args.topic.strip() or None
     if not topic_hint:
-        if preset.get("topic_rotation") == "myth":
-            from pipeline.myth_topics import pick_myth_topic
-
-            topic_hint, myth_theme_for_commit = pick_myth_topic(args.channel)
-            myth_topic_for_commit = topic_hint
-            print(f"📿 Myth theme today (IST): {myth_theme_for_commit} → {topic_hint!r}")
-        else:
-            pool = preset.get("topic_pool") or []
-            if pool:
-                topic_hint = random.choice(pool)
-                print(f"🎲 Random topic from pool: {topic_hint!r}")
+        pool = preset.get("topic_pool") or []
+        if pool:
+            topic_hint = random.choice(pool)
+            print(f"🎲 Random topic from pool: {topic_hint!r}")
 
     variants = preset.get("variants") or []
     primary_video_path: Path | None = None
@@ -245,10 +232,6 @@ def main() -> None:
     summary = " ".join(history_narration.split()[:25]) + "…"
     save_title(args.channel, history_title, summary)
 
-    if myth_theme_for_commit and myth_topic_for_commit:
-        from pipeline.myth_topics import commit_myth_topic
-
-        commit_myth_topic(args.channel, myth_theme_for_commit, myth_topic_for_commit)
 
     # Optional second upload: same rendered MP4 to extra channels (e.g. second bhakti channel).
     # Uses env var names listed in preset["extra_yt_token_envs"].

@@ -71,7 +71,7 @@ def generate_short_pack(
 
 
 # ─────────────────────────────────────────────────────────────────────────
-# Single-language path (backward compat for ghost_stories, school_story, etc.)
+# Single-language path (for facts, school_story, history_micro, etc.)
 # ─────────────────────────────────────────────────────────────────────────
 def _generate_single(preset: ChannelPreset, user: str, n: int) -> dict[str, Any]:
     language = (preset.get("language") or "en").lower()

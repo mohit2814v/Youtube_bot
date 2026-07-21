@@ -12,7 +12,7 @@ scripts/run_short.py          ← orchestrator
   pipeline/captions.py        ← SRT from segment timings
   pipeline/render_short.py    ← FFmpeg: slideshow + audio + burned captions
   pipeline/youtube_upload.py  ← YouTube Data API v3 upload
-  pipeline/channel_presets.py ← niche presets (ghost_stories, facts, etc.)
+  pipeline/channel_presets.py ← niche presets (facts, school_story, etc.)
 ```
 
 ## Quick Start (local)
@@ -31,10 +31,10 @@ cp .env.example .env
 brew install ffmpeg         # macOS
 # sudo apt install ffmpeg   # Ubuntu
 
-# Generate a ghost story Short (no upload):
-.venv/bin/python scripts/run_short.py --channel ghost_stories
+# Generate a racing academy story Short (no upload):
+.venv/bin/python scripts/run_short.py --channel school_story
 
-# Output → output/runs/ghost_stories_<timestamp>/short.mp4
+# Output → output/runs/school_story_<timestamp>/short.mp4
 ```
 
 ## Free API Keys You Need
@@ -64,7 +64,7 @@ brew install ffmpeg         # macOS
 8. Now you can upload:
 
 ```bash
-.venv/bin/python scripts/run_short.py --channel ghost_stories --upload --privacy private
+.venv/bin/python scripts/run_short.py --channel school_story --upload --privacy private
 ```
 
 ## GitHub Actions (daily autopilot)
@@ -83,24 +83,23 @@ Go to **repo → Settings → Secrets and variables → Actions → New reposito
 
 ### Trigger
 
-- **Automatic**: runs daily at 10:00 UTC (edit cron in `.github/workflows/daily_short.yml`)
-- **Manual**: Actions tab → "Daily YouTube Short" → Run workflow → pick channel + topic
+- **Automatic (Monday–Friday)**: runs at 7:00 AM IST (`01:30 UTC`) via `daily_facts.yml` (`facts` channel)
+- **Automatic (Saturday & Sunday)**: runs at 8:00 AM IST (`02:30 UTC`) via `daily_short.yml` (`school_story` channel)
+- **Manual**: Actions tab → "Daily YouTube Short" or "Daily Facts Short" → Run workflow → pick channel + topic
 
 ### Change channel / schedule
 
-Edit `.github/workflows/daily_short.yml`:
-- Change `cron: "0 10 * * *"` to your preferred time ([crontab.guru](https://crontab.guru/))
+Edit `.github/workflows/daily_facts.yml` or `.github/workflows/daily_short.yml`:
+- Change `cron:` expression to your preferred UTC time (`IST minus 5 hours 30 minutes`) ([crontab.guru](https://crontab.guru/))
 - Change default channel in the `CHANNEL=` line
 
 ## Channel Presets
 
 | `--channel` | Niche |
 |-------------|-------|
-| `ghost_stories` | Spooky / horror storytime |
-| `facts` | Interesting facts / trivia |
-| `school_story` | School drama / storytime |
-| `psych_tradeoff` | Psychology / habits |
-| `history_micro` | One moment in history |
+| `facts` | Formula 1 Grand Prix & Hypercar Engineering Secrets |
+| `school_story` | Current F1 Drivers: Backstories, School Days & Off-Track Legends |
+| `history_micro` | One Dramatic Moment in F1 & Car History |
 
 Add your own in `pipeline/channel_presets.py`.
 
@@ -121,7 +120,7 @@ EDGE_TTS_VOICE=en-US-ChristopherNeural # deep male (default)
 
 ## Multi-Channel
 
-For multiple channels: duplicate the workflow YAML, use different `CHANNEL=` defaults and separate `YT_*` secrets per channel (e.g. `YT_REFRESH_TOKEN_FACTS`, `YT_REFRESH_TOKEN_GHOST`). Each channel needs its own YouTube OAuth.
+For multiple channels: duplicate the workflow YAML, use different `CHANNEL=` defaults and separate `YT_*` secrets per channel (e.g. `YT_REFRESH_TOKEN_FACTS`, `YT_REFRESH_TOKEN_SCHOOL`). Each channel needs its own YouTube OAuth.
 
 ## Cost
 
