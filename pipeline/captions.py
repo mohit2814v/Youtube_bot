@@ -26,7 +26,7 @@ def build_srt(
     out_path: Path,
     total_duration: float,
     *,
-    max_words_per_line: int = 5,
+    max_words_per_line: int = 2,
 ) -> Path:
     """Create .srt from sentence timestamps, splitting long sentences."""
     out_path = Path(out_path)

@@ -13,8 +13,8 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 FONTS_DIR = REPO_ROOT / "assets" / "fonts"
-DEFAULT_FONT_FILE = "CreepsterCaps.ttf"
-DEFAULT_FONT_NAME = "Creepster"
+DEFAULT_FONT_FILE = "Montserrat-ExtraBold.ttf"
+DEFAULT_FONT_NAME = "Montserrat ExtraBold"
 
 FPS = 30
 FADE_DUR = 0.5
@@ -95,26 +95,26 @@ def render_vertical_short(
     shutil.copyfile(srt_path, tmp / "captions.srt")
 
     font_path = FONTS_DIR / font_file
-    rendered_font_name = "Arial"
+    rendered_font_name = font_name if font_name else "Montserrat ExtraBold"
     fontsdir_arg = ""
     if font_path.is_file():
         font_dir = tmp / "_fonts"
         font_dir.mkdir(exist_ok=True)
         shutil.copyfile(font_path, font_dir / font_path.name)
-        rendered_font_name = font_name
         fontsdir_arg = ":fontsdir='_fonts'"
     else:
+        if not rendered_font_name or rendered_font_name == "Creepster":
+            rendered_font_name = "Montserrat ExtraBold"
         print(f"   ⚠ Font {font_path} not found — using {rendered_font_name}")
 
     force_style = (
         f"FontName={rendered_font_name},"
-        f"FontSize=18,"
-        f"PrimaryColour=&H00FFFFFF,"
+        f"FontSize=22,"
+        f"PrimaryColour=&H0000FFFF,"
         f"OutlineColour=&H00000000,"
-        f"BackColour=&H96000000,"
-        f"BorderStyle=4,Outline=1,Bold=1,"
-        f"Shadow=0,Alignment=2,"
-        f"MarginV=15,MarginL=20,MarginR=20"
+        f"BorderStyle=1,Outline=2,Bold=1,"
+        f"Shadow=1,Alignment=2,"
+        f"MarginV=25,MarginL=20,MarginR=20"
     )
 
     # ── 4. Build xfade chain + subtitles ─────────────────────────────

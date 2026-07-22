@@ -70,6 +70,7 @@ def _render_and_upload(
     upload: bool,
     privacy: str,
     yt_token_env: str = "YT_REFRESH_TOKEN",
+    schedule_peak: bool = True,
 ) -> Path:
     """Render one video (audio + SRT + MP4) for a single variant. Optionally upload."""
     print(f"\n━━━ Variant: {variant_label} ━━━")
@@ -102,7 +103,9 @@ def _render_and_upload(
             video_path, title, description,
             tags=tags,
             privacy_status=privacy,
+            category_id="2",
             refresh_token_env=yt_token_env,
+            schedule_peak=schedule_peak,
         )
         print(f"   Uploaded! https://www.youtube.com/shorts/{vid}")
     else:
@@ -117,6 +120,8 @@ def main() -> None:
     ap.add_argument("--topic", default="", help="Optional topic hint for Groq.")
     ap.add_argument("--upload", action="store_true", help="Upload to YouTube after render.")
     ap.add_argument("--privacy", default="private", choices=["private", "unlisted", "public"])
+    ap.add_argument("--schedule-peak", action="store_true", default=True, help="Schedule upload for peak active hours (default: True).")
+    ap.add_argument("--no-schedule-peak", dest="schedule_peak", action="store_false", help="Upload immediately without scheduling.")
     args = ap.parse_args()
 
     preset = get_preset(args.channel)
@@ -209,14 +214,15 @@ def main() -> None:
         description=pack.get("youtube_description", ""),
         tags=pack.get("youtube_tags"),
         voice=preset.get("tts_voice") or os.environ.get("EDGE_TTS_VOICE"),
-        font_file=preset.get("caption_font", "CreepsterCaps.ttf"),
-        font_name=preset.get("caption_font_name", "Creepster"),
+        font_file=preset.get("caption_font", "Montserrat-ExtraBold.ttf"),
+        font_name=preset.get("caption_font_name", "Montserrat ExtraBold"),
         image_paths=image_paths,
         run_dir=run_dir,
         suffix="",
         upload=args.upload,
         privacy=args.privacy,
         yt_token_env=preset.get("yt_token_env") or "YT_REFRESH_TOKEN",
+        schedule_peak=args.schedule_peak,
     )
 
     # ── 7. History ───────────────────────────────────────────────────
@@ -241,7 +247,9 @@ def main() -> None:
                 desc_extra,
                 tags=tags_extra,
                 privacy_status=args.privacy,
+                category_id="2",
                 refresh_token_env=env_name,
+                schedule_peak=args.schedule_peak,
             )
             print(f"   Extra channel video: https://www.youtube.com/shorts/{vid_extra}")
 

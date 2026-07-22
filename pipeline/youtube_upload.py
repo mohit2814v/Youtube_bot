@@ -13,6 +13,7 @@ if sys.stdout and hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 if sys.stderr and hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -147,6 +148,13 @@ def normalize_description(description: Any) -> str:
     return description.strip()[:5000]
 
 
+def get_peak_upload_time() -> str:
+    """Calculate optimal peak active hours upload time (next day at 5:00 PM / 17:00 UTC)."""
+    now = datetime.now(timezone.utc)
+    scheduled_time = (now + timedelta(days=1)).replace(hour=17, minute=0, second=0, microsecond=0)
+    return scheduled_time.isoformat()
+
+
 def upload_short(
     video_path: Path,
     title: str,
@@ -154,8 +162,10 @@ def upload_short(
     *,
     tags: list[str] | str | None = None,
     privacy_status: str = "private",
-    category_id: str = "24",
+    category_id: str = "2",
     refresh_token_env: str = "YT_REFRESH_TOKEN",
+    publish_at: str | None = None,
+    schedule_peak: bool = True,
 ) -> str:
     """Upload and return YouTube video ID.
 
@@ -166,6 +176,18 @@ def upload_short(
     youtube = build("youtube", "v3", credentials=creds)
     norm_desc = normalize_description(description)
     norm_tags = normalize_tags(tags)
+
+    if schedule_peak and not publish_at:
+        publish_at = get_peak_upload_time()
+
+    # Note: YouTube Data API v3 requires privacyStatus='private' when publishAt is set
+    status_body: dict[str, Any] = {
+        "privacyStatus": "private" if publish_at else privacy_status,
+        "selfDeclaredMadeForKids": False,
+    }
+    if publish_at:
+        status_body["publishAt"] = publish_at
+
     body = {
         "snippet": {
             "title": title[:100],
@@ -173,9 +195,7 @@ def upload_short(
             "categoryId": category_id,
             "tags": norm_tags,
         },
-        "status": {
-            "privacyStatus": privacy_status,
-        },
+        "status": status_body,
     }
     media = MediaFileUpload(str(video_path), chunksize=-1, resumable=True, mimetype="video/mp4")
     req = youtube.videos().insert(part="snippet,status", body=body, media_body=media)

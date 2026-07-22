@@ -55,18 +55,26 @@ def _deapi_generate(
     }
 
     with httpx.Client(timeout=60.0) as client:
-        # Submit with retry on 429
+        # Submit with retry on 429 and timeouts/network errors
+        resp = None
         for submit_try in range(5):
-            resp = client.post(DEAPI_SUBMIT_URL, json=payload, headers=headers)
-            if resp.status_code == 429:
-                wait = 15 * (submit_try + 1)
-                print(f"      DeAPI 429 on submit — waiting {wait}s (try {submit_try + 1}/5)…")
+            try:
+                resp = client.post(DEAPI_SUBMIT_URL, json=payload, headers=headers)
+                if resp.status_code == 429:
+                    wait = 15 * (submit_try + 1)
+                    print(f"      DeAPI 429 on submit — waiting {wait}s (try {submit_try + 1}/5)…")
+                    time.sleep(wait)
+                    continue
+                resp.raise_for_status()
+                break
+            except (httpx.TimeoutException, httpx.TransportError) as e:
+                wait = 5 * (submit_try + 1)
+                print(f"      DeAPI timeout/network error on submit ({e}) — waiting {wait}s (try {submit_try + 1}/5)…")
                 time.sleep(wait)
-                continue
-            resp.raise_for_status()
-            break
-        else:
-            raise RuntimeError("DeAPI: 429 on submit after 5 retries")
+                if submit_try == 4:
+                    raise
+        if resp is None:
+            raise RuntimeError("DeAPI: failed on submit after 5 retries")
 
         data = resp.json()
 
@@ -84,13 +92,17 @@ def _deapi_generate(
         for attempt in range(1, max_polls + 1):
             time.sleep(poll_interval)
 
-            poll_resp = client.get(
-                f"{DEAPI_POLL_URL}/{request_id}",
-                headers=poll_headers,
-                timeout=30.0,
-            )
-            poll_resp.raise_for_status()
-            poll_data = poll_resp.json()
+            try:
+                poll_resp = client.get(
+                    f"{DEAPI_POLL_URL}/{request_id}",
+                    headers=poll_headers,
+                    timeout=30.0,
+                )
+                poll_resp.raise_for_status()
+                poll_data = poll_resp.json()
+            except (httpx.TimeoutException, httpx.TransportError) as e:
+                print(f"      DeAPI poll timeout/network error on attempt {attempt}/{max_polls} ({e}) — retrying…")
+                continue
 
             status = poll_data.get("data", {}).get("status", "")
 
@@ -99,8 +111,18 @@ def _deapi_generate(
                 if not image_url:
                     raise RuntimeError(f"Completed but no result_url: {poll_data}")
 
-                img_resp = client.get(image_url, timeout=60.0)
-                img_resp.raise_for_status()
+                for download_try in range(5):
+                    try:
+                        img_resp = client.get(image_url, timeout=60.0)
+                        img_resp.raise_for_status()
+                        break
+                    except (httpx.TimeoutException, httpx.TransportError) as e:
+                        wait = 3 * (download_try + 1)
+                        print(f"      DeAPI image download timeout ({e}) — waiting {wait}s (try {download_try + 1}/5)…")
+                        time.sleep(wait)
+                        if download_try == 4:
+                            raise
+
                 print(f"      DeAPI done (polled {attempt}x)")
                 return img_resp.content
 
@@ -121,7 +143,7 @@ def save_scene_image(
     height: int = 768,
     negative: str = DEFAULT_NEGATIVE,
 ) -> tuple[str, str]:
-    """Generate and save one image. Returns (status, detail)."""
+    """Generate and save one image. Returns (status, detail). Retries up to 3 times."""
     api_key = os.environ.get("DEAPI_TOKEN", "").strip()
     if not api_key:
         return "fail", "DEAPI_TOKEN not set"
@@ -130,15 +152,23 @@ def save_scene_image(
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    try:
-        img_bytes = _deapi_generate(
-            prompt,
-            api_key=api_key,
-            width=width,
-            height=height,
-            model=model,
-        )
-        out_path.write_bytes(img_bytes)
-        return "ok", "deapi"
-    except Exception as e:
-        return "fail", str(e)
+    last_err = "Unknown error"
+    for try_num in range(1, 4):
+        try:
+            img_bytes = _deapi_generate(
+                prompt,
+                api_key=api_key,
+                width=width,
+                height=height,
+                model=model,
+            )
+            out_path.write_bytes(img_bytes)
+            return "ok", "deapi"
+        except Exception as e:
+            last_err = str(e)
+            if try_num < 3:
+                wait = 5 * try_num
+                print(f"   ⚠ Image {index} attempt {try_num}/3 failed ({last_err}) — retrying in {wait}s…")
+                time.sleep(wait)
+
+    return "fail", last_err

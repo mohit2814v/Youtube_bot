@@ -49,14 +49,14 @@ PRESETS: dict[str, ChannelPreset] = {
         "label": "Formula 1 Grand Prix Facts & Hypercar Engineering Secrets",
         "language": "en",
         "tts_voice": "en-US-GuyNeural",
-        "caption_font": "BebasNeue-Regular.ttf",
-        "caption_font_name": "Bebas Neue",
+        "caption_font": "Montserrat-ExtraBold.ttf",
+        "caption_font_name": "Montserrat ExtraBold",
         "yt_token_env": "YT_REFRESH_TOKEN_EN",
-        "min_words": 115,
+        "min_words": 95,
         "groq_system_hint": (
             "You write punchy, high-octane, viral YouTube Shorts focused EXCLUSIVELY on the latest Formula 1 Grand Prix facts and figures, race telemetry, extreme speed limits, and classified-feeling mechanical/chemical secrets in F1 and Hypercars. "
             "THEME & CONTENT FOCUS: Your topics MUST revolve around the latest F1 Grand Prix race data, extreme qualifying lap metrics, tire degradation curves, pitstop telemetry, active race strategy figures, G-force loads at famous Grand Prix corners (Monza, Spa, Silverstone, Monaco, Las Vegas), wing flex telemetry, fuel load dynamics, and breaking engineering barriers (like F1 fuel chemistry, Bugatti Chiron top speed limits, or 1000°C brake thermal dissipation). "
-            "TITLE FORMAT: Always format youtube_title in a high-curiosity style like 'Bugatti Chiron: The Speed Limit', 'The Secrets of F1 Fuel', or 'Monza GP: The 218 MPH Telemetry Secret' (<90 chars, no hashtags). "
+            "TITLE FORMAT: Always format youtube_title in a high-curiosity style like 'Bugatti Chiron: The Speed Limit', 'The Secrets of F1 Fuel', or 'Monza GP: The 218 MPH Telemetry Secret' (<60 chars, no hashtags). "
             "STRUCTURE: Start with an explosive hook revealing a jaw-dropping Grand Prix stat, extreme speed limit, or hidden engineering figure in the very first sentence. In the middle, explain the intense science, race telemetry, or mechanical physics (e.g., G-forces, fuel additives, downforce numbers, or thermal dissipation). End with a powerful closing takeaway on why this pushes the absolute boundaries of human engineering and Grand Prix racing. "
             "TONE: Intense, authoritative, high-tech, revealing classified performance and race telemetry secrets with confident gearhead/motorsport scientist energy. No fake clickbait—use real, verifiable Grand Prix figures and exact engineering data. "
             "No hashtags inside narration. Original phrasing only. "
@@ -116,14 +116,14 @@ PRESETS: dict[str, ChannelPreset] = {
         "label": "Current F1 Drivers: Backstories, School Days & Off-Track Legends",
         "language": "en",
         "tts_voice": "en-US-GuyNeural",
-        "caption_font": "BebasNeue-Regular.ttf",
-        "caption_font_name": "Bebas Neue",
+        "caption_font": "Montserrat-ExtraBold.ttf",
+        "caption_font_name": "Montserrat ExtraBold",
         "yt_token_env": "YT_REFRESH_TOKEN_SCHOOL",
-        "min_words": 110,
+        "min_words": 95,
         "groq_system_hint": (
             "You write punchy, entertaining, high-curiosity storytime Shorts focused exclusively on real-life backstories, off-track moments, school days, and quirky legends of CURRENT Formula 1 drivers (like Kimi Antonelli, Max Verstappen, Lando Norris, Charles Leclerc, Oscar Piastri, Lewis Hamilton, and Fernando Alonso). "
             "THEME & CONTENT FOCUS: Highlight unbelievable real-life anecdotes such as teenage F1 drivers balancing high school homework with Mercedes F1 telemetry debriefs, getting calls from school right after a Grand Prix, driver habits, or legendary moments like Max Verstappen pointing to his apartment balcony while winning Monaco. "
-            "TITLE FORMAT: Always format youtube_title in an engaging, viral style like 'Kimi Antonelli's F1 Homework', 'Max Verstappen's Monaco Secret', or 'When F1 Called Kimi's School' (<90 chars, no hashtags). "
+            "TITLE FORMAT: Always format youtube_title in an engaging, viral style like 'Kimi Antonelli's F1 Homework', 'Max Verstappen's Monaco Secret', or 'When F1 Called Kimi's School' (<60 chars, no hashtags). "
             "STRUCTURE: Start with a jaw-dropping hook in line 1 revealing the crazy off-track situation or age/school contrast. In the middle, tell the true, entertaining story with exact details (e.g., engineering debriefs, classroom reactions, simulator rigs, or paddock life). End with a memorable, punchy takeaway about how these modern F1 superstars live on and off the grid. "
             "TONE: Entertaining, authentic, gearhead-friendly, fast-paced, and fascinating. Keep it factual to the driver's real personality and history. No hashtags in narration. "
             "IMAGE PROMPT RULE: write image prompts in ENGLISH only. Describe cinematic real-world style photographs of current Formula 1 drivers in the paddock, wearing team race suits, in debrief rooms with engineers, walking in Monaco, or driving modern F1 cars on track. "
