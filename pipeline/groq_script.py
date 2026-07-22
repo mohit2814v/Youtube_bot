@@ -56,6 +56,7 @@ def generate_short_pack(
         if anti_repeat:
             user += anti_repeat
 
+    n = int(preset.get("segment_count", 5))
     return _generate_single(preset, user, n)
 
 
@@ -168,3 +169,25 @@ def _call_groq(
     if not raw:
         raise RuntimeError("Empty Groq response")
     return json.loads(raw)
+
+
+if __name__ == "__main__":
+    import argparse
+    from pathlib import Path
+    from dotenv import load_dotenv
+
+    load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+
+    from pipeline.channel_presets import get_preset, list_channel_ids
+
+    parser = argparse.ArgumentParser(description="Test Groq script generation.")
+    parser.add_argument("--channel", default="school_story", choices=list_channel_ids(), help="Channel preset to test")
+    parser.add_argument("--topic", default="", help="Optional topic hint")
+    args = parser.parse_args()
+
+    preset = get_preset(args.channel)
+    print(f"Generating script for channel '{args.channel}' using Groq ({GROQ_MODEL})...")
+    result = generate_short_pack(preset, topic_hint=args.topic, channel_id=args.channel)
+    print("\n--- Generated Output JSON ---")
+    print(json.dumps(result, indent=2, ensure_ascii=False))
+
