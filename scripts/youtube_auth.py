@@ -53,7 +53,7 @@ def main() -> None:
 
     print("Opening browser for Google OAuth…")
     flow = InstalledAppFlow.from_client_secrets_file(str(client_secret), SCOPES)
-    creds = flow.run_local_server(port=0)
+    creds = flow.run_local_server(port=0, prompt="consent")
 
     SECRETS.mkdir(parents=True, exist_ok=True)
     token_out.write_text(creds.to_json(), encoding="utf-8")

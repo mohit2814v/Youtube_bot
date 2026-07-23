@@ -165,7 +165,7 @@ def upload_short(
     category_id: str = "2",
     refresh_token_env: str = "YT_REFRESH_TOKEN",
     publish_at: str | None = None,
-    schedule_peak: bool = True,
+    schedule_peak: bool = False,
 ) -> str:
     """Upload and return YouTube video ID.
 

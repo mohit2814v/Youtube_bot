@@ -120,7 +120,7 @@ def main() -> None:
     ap.add_argument("--topic", default="", help="Optional topic hint for Groq.")
     ap.add_argument("--upload", action="store_true", help="Upload to YouTube after render.")
     ap.add_argument("--privacy", default="private", choices=["private", "unlisted", "public"])
-    ap.add_argument("--schedule-peak", action="store_true", default=True, help="Schedule upload for peak active hours (default: True).")
+    ap.add_argument("--schedule-peak", action="store_true", help="Schedule upload for peak active hours (default: False).")
     ap.add_argument("--no-schedule-peak", dest="schedule_peak", action="store_false", help="Upload immediately without scheduling.")
     args = ap.parse_args()
 
