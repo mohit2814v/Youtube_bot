@@ -51,7 +51,7 @@ PRESETS: dict[str, ChannelPreset] = {
         "tts_voice": "en-US-GuyNeural",
         "caption_font": "Montserrat-ExtraBold.ttf",
         "caption_font_name": "Montserrat ExtraBold",
-        "yt_token_env": "YT_REFRESH_TOKEN_EN",
+        "yt_token_env": "YT_REFRESH_TOKEN",
         "min_words": 95,
         "groq_system_hint": (
             "You write punchy, high-octane, viral YouTube Shorts focused EXCLUSIVELY on the latest Formula 1 Grand Prix facts and figures, race telemetry, extreme speed limits, and classified-feeling mechanical/chemical secrets in F1 and Hypercars. "

@@ -17,8 +17,7 @@ env:
   # Shared YouTube OAuth app (same client_id + client_secret for both channels)
   YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
   YT_CLIENT_SECRET_VALUE: ${{ secrets.YT_CLIENT_SECRET_VALUE }}
-  # Per-channel refresh token for English facts channel
-  YT_REFRESH_TOKEN_EN: ${{ secrets.YT_REFRESH_TOKEN_EN }}
+
   # Fallback if channel-specific token is missing
   YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
 
