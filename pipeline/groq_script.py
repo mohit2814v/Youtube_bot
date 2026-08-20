@@ -16,7 +16,7 @@ from pipeline.channel_presets import ChannelPreset
 from pipeline.story_history import history_prompt_block
 from pipeline.youtube_upload import normalize_description, normalize_tags
 
-GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "openai/gpt-oss-120b")
 
 SEO_SYSTEM_PROMPT = """You are a YouTube Shorts SEO expert specializing in Automotive, Cars, and Formula 1 content.
 
