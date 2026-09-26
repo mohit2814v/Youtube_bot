@@ -24,6 +24,7 @@ Rules for Title:
 - Keep under 60 characters for mobile display.
 - Place the strongest hook keyword (e.g., "F1", "Bugatti", "Ferrari", "Car Myth") in the first 3 words.
 - Use curiosity gaps or bold claims (e.g., "The Secret Reason F1 Cars Cost $15M").
+- USE VERY SIMPLE, EVERYDAY LANGUAGE. Avoid complex words. Keep it easy to understand for a 10-year-old.
 
 Rules for Tags:
 - Generate 10-12 tags as comma-separated values.
@@ -33,6 +34,7 @@ Rules for Tags:
 
 HOOK_PROMPT = """Create a 3-second opening hook for a YouTube Short about {topic}.
 Must start with an action verb, a controversial question, or a surprising number.
+Use VERY SIMPLE, basic vocabulary. Do NOT use complex words.
 Examples:
 - "Why did Ford spend $25 Million just to beat Ferrari?"
 - "This single F1 rule changed racing forever."
@@ -45,6 +47,7 @@ LANG_WORD_TARGETS = {
         120,
         155,
         "120-155 English words for variants.en.full_narration (~40-50 sec); "
+        "use VERY SIMPLE, basic vocabulary so a 10-year-old can understand; "
         "add transitions, examples, and a closing takeaway — NOT a bullet list",
     ),
 }
@@ -146,12 +149,12 @@ def _generate_single(preset: ChannelPreset, user: str, n: int) -> dict[str, Any]
         '"full_narration": "COMPLETE story/script as one continuous paragraph. This is what the voice will read. '
         f'Must be {blurb}. Natural narration — no segment breaks, no numbering."'
     )
-    strict_extra = f"- full_narration is ONE continuous paragraph, {lo}-{hi} English words.\n"
+    strict_extra = f"- full_narration is ONE continuous paragraph, {lo}-{hi} English words.\n- USE EXTREMELY SIMPLE LANGUAGE and BASIC VOCABULARY (8th grade reading level).\n"
 
     user += f"""
 Return ONLY valid JSON with this shape:
 {{
-  "youtube_title": "short catchy title under 60 chars, strongest hook keyword (e.g. 'F1', 'Bugatti', 'Ferrari') in first 3 words, no hashtags",
+  "youtube_title": "short catchy title under 60 chars, strongest hook keyword (e.g. 'F1', 'Bugatti', 'Ferrari') in first 3 words, VERY SIMPLE LANGUAGE, no hashtags",
   "youtube_description": "Detailed 4-5 sentence SEO-optimized summary naturally incorporating high-search-volume keywords and key takeaways, followed by 5-8 viral hashtags at the end including #Shorts",
   "youtube_tags": [
     "cars", "f1", "ferrarimotorsport", "car facts",
